@@ -1,0 +1,15 @@
+SITIO WEB DE OJO FELINO - como publicarlo (GitHub Pages)
+
+1) En GitHub (web), crea un repositorio nuevo, PUBLICO, llamado: ojofelino-web
+   (GitHub Pages gratis exige repo publico; el sitio solo tiene paginas e imagenes, nada del codigo del juego).
+2) Sube todo el contenido de esta carpeta (index.html, CNAME, .nojekyll y la carpeta img).
+   Se puede hacer con "Add file > Upload files" arrastrando los archivos.
+3) En el repo: Settings > Pages > Source: "Deploy from a branch", rama main, carpeta / (root). Guardar.
+   En "Custom domain" debe aparecer www.ojofelino.com (viene del archivo CNAME). Marcar "Enforce HTTPS" cuando se habilite.
+4) En el panel DNS del dominio (Donweb para .com; NIC.ar usa los DNS que le indiques) crea:
+   - CNAME   www   ->  TU-USUARIO-DE-GITHUB.github.io
+   - Cuatro registros A en el dominio raiz (@) hacia: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153
+   (Los DNS pueden tardar desde minutos hasta unas horas.)
+5) Para ojofelino.com.ar: en NIC.ar delegalo a los mismos DNS que uses para el .com, o crea una redireccion hacia www.ojofelino.com desde el panel donde esten los DNS.
+
+Para completar despues: los enlaces de descarga de la demo (index.html, seccion DEMO: cambiar href="#" y quitar la clase "off"), Patreon y redes (seccion COLABORAR).

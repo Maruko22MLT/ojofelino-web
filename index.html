@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ojo Felino: La Leyenda de Gardia</title>
+<meta name="description" content="Ojo Felino: La Leyenda de Gardia. Aventura isométrica en pixel art con motor propio. Demo en desarrollo.">
+<meta property="og:title" content="Ojo Felino: La Leyenda de Gardia">
+<meta property="og:description" content="Aventura isométrica en pixel art. Un mundo desolado, mazmorras, combate y viajes por el desierto.">
+<meta property="og:image" content="https://www.ojofelino.com/img/p_portada.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0c22;--navy:#12163a;--pur:#3a3470;--pur2:#6a5aa8;--pink:#e89696;--gold:#f0c060;--cream:#fff0d8;--panel:rgba(18,22,58,.76);--card:rgba(58,52,112,.45);--shade:10,12,34}
+html[data-theme="warm"]{--bg:#1a0a06;--navy:#2c140c;--pur:#7a4020;--pur2:#c0702c;--pink:#f4a860;--gold:#ffd27a;--cream:#fff1dc;--panel:rgba(44,20,12,.76);--card:rgba(122,64,32,.4);--shade:26,10,6}
+body,header,.panel,.card,th,footer,.btn,.shots figure,.stage{transition:background-color 1.5s,border-color 1.5s,color 1.5s,box-shadow 1.5s}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:'VT323',monospace;font-size:23px;line-height:1.35;overflow-x:hidden}
+img{max-width:100%;display:block}
+.px{image-rendering:pixelated}
+a{color:var(--gold)}
+html[lang="es"] [lang="en"],html[lang="en"] [lang="es"]{display:none!important}
+
+/* fondo cambiante */
+.bgfx{position:fixed;inset:0;z-index:-3;background:var(--bg)}
+.bgfx .l{position:absolute;inset:-4%;background-size:cover;background-position:center;opacity:0;transition:opacity 2.5s ease;animation:kb 28s ease-in-out infinite alternate;image-rendering:pixelated}
+.bgfx .l.on{opacity:1}
+@keyframes kb{from{transform:scale(1.02) translate(0,0)}to{transform:scale(1.12) translate(-1.5%,1%)}}
+.shade{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(var(--shade),.38),rgba(var(--shade),.74) 60%,rgba(var(--shade),.9))}
+.scan{position:fixed;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+#sparks{position:fixed;inset:0;z-index:-1;pointer-events:none}
+
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(var(--shade),.88);backdrop-filter:blur(6px);border-bottom:3px solid var(--pur)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;flex-wrap:wrap}
+.mini{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--gold);text-decoration:none}
+nav{display:flex;gap:14px;font-size:20px;align-items:center;flex-wrap:wrap}
+nav a{text-decoration:none;color:var(--cream)}
+nav a:hover{color:var(--gold)}
+.lang button{font:inherit;background:none;color:var(--cream);border:2px solid var(--pur2);padding:0 8px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+
+.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 0 60px}
+.logo{width:min(720px,92vw);height:auto;filter:drop-shadow(0 0 26px rgba(240,170,60,.35));animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.tag{font-size:30px;color:var(--pink);margin:22px 0 26px;text-shadow:0 2px 0 #000}
+.btn{display:inline-block;font-family:'Press Start 2P',monospace;font-size:13px;padding:14px 18px;background:var(--gold);color:var(--bg);text-decoration:none;border:3px solid var(--cream);margin:6px;box-shadow:4px 4px 0 var(--pur);transition:transform .1s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--pur)}
+.btn.alt{background:transparent;color:var(--cream);border-color:var(--pur2)}
+.btn.off{background:transparent;color:var(--pur2);border-color:var(--pur);box-shadow:none;cursor:default}
+.scroll{margin-top:40px;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--pur2);animation:blink 1.6s steps(2) infinite}
+@keyframes blink{50%{opacity:.2}}
+
+section{padding:34px 0}
+.panel{background:var(--panel);border:3px solid var(--pur);padding:24px;backdrop-filter:blur(3px)}
+h2{font-family:'Press Start 2P',monospace;font-weight:400;font-size:16px;margin:0 0 18px;color:var(--gold);text-shadow:0 2px 0 #000;line-height:1.5}
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s}
+.rv.in{opacity:1;transform:none}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
+.card{background:var(--card);border:3px solid var(--pur2);padding:14px}
+.card h3{font-family:'Press Start 2P',monospace;font-weight:400;font-size:11px;margin:0 0 10px;color:var(--pink)}
+
+/* mazmorra */
+.dun{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:center}
+.dunimg{position:relative;border:3px solid var(--gold);overflow:hidden;box-shadow:0 0 30px rgba(240,160,70,.25)}
+.dunimg img{width:100%;height:auto;animation:kb2 20s ease-in-out infinite alternate}
+@keyframes kb2{from{transform:scale(1)}to{transform:scale(1.08)}}
+.dunimg::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 30%,rgba(255,170,60,.38),transparent 45%);mix-blend-mode:screen;animation:torch 1.1s steps(6) infinite}
+@keyframes torch{0%{opacity:.6}25%{opacity:1}50%{opacity:.75}75%{opacity:.95}100%{opacity:.65}}
+@media (max-width:760px){.dun{grid-template-columns:1fr}}
+
+/* duelo */
+.stage{position:relative;height:330px;border:3px solid var(--gold);overflow:hidden;margin-top:24px;background:#000}
+.stage .bgd{position:absolute;inset:0;background-size:cover;background-position:center bottom;transition:opacity 1s;image-rendering:pixelated}
+.stage .floor{position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(180deg,rgba(var(--shade),0),rgba(var(--shade),.85))}
+.actor{position:absolute;bottom:34px;transition:transform .25s steps(5)}
+.actor img{image-rendering:pixelated;display:block;transition:filter 1.5s}
+#hero-a{left:12%}
+#foe-a{right:10%}
+.hud{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;gap:10px;font-family:'Press Start 2P',monospace;font-size:10px}
+.hud .bar{width:150px;height:10px;border:2px solid var(--cream);background:#000;margin-top:5px}
+.hud .bar i{display:block;height:100%;background:var(--pink);transition:width .4s steps(8)}
+.hud .r{text-align:right}
+.pop{position:absolute;font-family:'Press Start 2P',monospace;font-size:16px;color:var(--gold);text-shadow:2px 2px 0 #000;opacity:0;pointer-events:none}
+.pop.go{animation:pop 1s ease-out}
+@keyframes pop{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
+.shake{animation:shake .35s steps(4)}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.flash{filter:brightness(2.4) saturate(.4)}
+@media (max-width:560px){.stage{height:260px}.hud .bar{width:90px}}
+
+/* postales */
+.cards2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.post{position:relative;border:3px solid var(--pur2);overflow:hidden;animation:bob 7s ease-in-out infinite}
+.post:nth-child(2n){animation-delay:-2s}.post:nth-child(3n){animation-delay:-4s}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.post img{width:100%;height:100%;object-fit:cover;aspect-ratio:2/3;transition:transform .8s}
+.post.w{grid-column:span 2;}
+.post.w img{aspect-ratio:16/9}
+.post:hover img{transform:scale(1.08)}
+.post:hover{border-color:var(--gold)}
+@media (max-width:560px){.post.w{grid-column:span 1}.post.w img{aspect-ratio:16/9}}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.shots figure{margin:0;background:rgba(var(--shade),.8);border:3px solid var(--pur2)}
+.shots img{width:100%;height:auto;image-rendering:pixelated}
+.shots figcaption{padding:6px 10px;color:var(--pink)}
+
+
+/* capturas */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.tab{font-family:'Press Start 2P',monospace;font-size:11px;padding:10px 14px;background:transparent;color:var(--cream);border:3px solid var(--pur2);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.pane{display:none;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.pane.on{display:grid;animation:fin .6s}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pane button{padding:0;border:3px solid var(--pur2);background:#000;cursor:zoom-in;overflow:hidden;transition:border-color .2s}
+.pane button:hover{border-color:var(--gold)}
+.pane img{width:100%;height:auto;image-rendering:pixelated;transition:transform .6s}
+.pane button:hover img{transform:scale(1.06)}
+#lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:100%;image-rendering:pixelated;border:3px solid var(--gold)}
+/* sobre mi */
+.about{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+.me{width:288px;height:auto;image-rendering:pixelated;border:4px solid var(--gold);box-shadow:6px 6px 0 var(--pur);animation:bob 6s ease-in-out infinite}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chips a.chip{text-decoration:none}.chips a.chip:hover{border-color:var(--gold);color:var(--gold)}
+.chip{font-family:'Press Start 2P',monospace;font-size:10px;padding:8px 10px;border:3px solid var(--pur2);color:var(--cream);background:var(--card)}
+@media (max-width:700px){.about{grid-template-columns:1fr;justify-items:center;text-align:left}.me{width:220px}}
+table{width:100%;border-collapse:collapse}
+th,td{border:2px solid var(--pur2);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--card);color:var(--gold);font-weight:400}
+.est{white-space:nowrap}
+.note{color:var(--pink)}
+footer{border-top:3px solid var(--pur);background:rgba(var(--shade),.92);padding:24px 0 40px;color:var(--pur2);font-size:20px}
+@media (max-width:560px){body{font-size:20px}table{table-layout:fixed}th,td{padding:6px;overflow-wrap:anywhere}.est{white-space:normal}th:first-child,td:first-child{width:26%}th.est,td.est{width:30%}.panel{padding:16px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="bgfx" id="bgfx"></div><div class="shade"></div><div class="scan"></div><canvas id="sparks"></canvas>
+
+<header><div class="wrap">
+  <a class="mini" href="#inicio">OJO FELINO</a>
+  <nav>
+    <a href="#juego"><span lang="es">El juego</span><span lang="en">The game</span></a>
+    <a href="#aventura"><span lang="es">Aventura</span><span lang="en">Adventure</span></a>
+    <a href="#capturas"><span lang="es">Capturas</span><span lang="en">Screenshots</span></a>
+    <a href="#demo">Demo</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#apoyo"><span lang="es">Colaborar</span><span lang="en">Support</span></a>
+    <a href="#sobre-mi"><span lang="es">Sobre mí</span><span lang="en">About</span></a>
+    <span class="lang"><button id="bes" aria-pressed="true">ES</button> <button id="ben" aria-pressed="false">EN</button></span>
+  </nav>
+</div></header>
+
+<main id="inicio">
+  <div class="wrap hero">
+    <img class="logo" src="img/logo_dorado.png" alt="Ojo Felino: La Leyenda de Gardia" width="1400" height="638">
+    <p class="tag"><span lang="es">Un mundo que se apaga. Un ojo que nunca duerme.</span><span lang="en">A fading world. An eye that never sleeps.</span></p>
+    <p>
+      <a class="btn" href="#demo"><span lang="es">Probar la demo</span><span lang="en">Try the demo</span></a>
+      <a class="btn alt" href="#roadmap">Roadmap</a>
+    </p>
+    <div class="scroll">▼</div>
+  </div>
+
+  <div class="wrap">
+  <section id="juego" class="rv"><div class="panel">
+    <h2><span lang="es">EL JUEGO</span><span lang="en">THE GAME</span></h2>
+    <p lang="es">Ojo Felino: La Leyenda de Gardia es una aventura isométrica en pixel art, hecha con un motor propio. Exploras un desierto herido, viajas de una ciudad a otra, bajas a mazmorras olvidadas y peleas por turnos contra criaturas que salen de la tierra. Tiene tres actos y se lanzará completo.</p>
+    <p lang="en">Ojo Felino: La Leyenda de Gardia (The Legend of Gardia) is an isometric pixel-art adventure built on a custom engine. You cross a wounded desert, travel between cities, descend into forgotten dungeons and fight creatures that crawl out of the earth. It has three acts and will launch complete.</p>
+    <div class="cards">
+      <div class="card"><h3><span lang="es">EXPLORAR</span><span lang="en">EXPLORE</span></h3><span lang="es">Una ciudadela viva, caminos por el desierto y decisiones de ruta que cuestan agua, leña y tiempo.</span><span lang="en">A living citadel, desert roads and route choices that cost water, firewood and time.</span></div>
+      <div class="card"><h3><span lang="es">COMBATIR</span><span lang="en">FIGHT</span></h3><span lang="es">Combate con ritmo, defensa y golpes críticos contra un bestiario propio.</span><span lang="en">Rhythm-based combat with guards and critical hits against a bestiary of its own.</span></div>
+      <div class="card"><h3><span lang="es">DESCUBRIR</span><span lang="en">DISCOVER</span></h3><span lang="es">Mazmorras con pisos cada vez más profundos y una leyenda que nadie termina de contar.</span><span lang="en">Dungeons that go deeper and deeper, and a legend nobody finishes telling.</span></div>
+    </div>
+  </div></section>
+
+  <section id="aventura" class="rv"><div class="panel">
+    <h2><span lang="es">BAJAR A LA OSCURIDAD</span><span lang="en">DESCEND INTO THE DARK</span></h2>
+    <div class="dun">
+      <div class="dunimg"><img src="img/mazmorra.jpg" alt="" width="1600" height="900"></div>
+      <div>
+        <p lang="es">Cada mazmorra es un laberinto de piedra antigua, con trampas, puertas selladas y salas que se hunden en la penumbra. Una antorcha te muestra solo lo que tenés cerca; lo demás es silencio... hasta que algo se mueve.</p>
+        <p lang="es">Entre una mazmorra y otra hay que cruzar el desierto: cuidar el agua, buscar leña, decidir cuándo acampar y qué camino tomar. Y cuando aparece un enemigo, el combate se define en un instante.</p>
+        <p lang="en">Every dungeon is a maze of ancient stone, with traps, sealed doors and rooms that sink into the gloom. A torch shows only what is near you; the rest is silence... until something moves.</p>
+        <p lang="en">Between dungeons you must cross the desert: ration your water, find firewood, decide when to camp and which road to take. And when an enemy shows up, the fight is settled in an instant.</p>
+      </div>
+    </div>
+    <div class="stage" id="stage" aria-hidden="true">
+      <div class="bgd" id="stbg"></div><div class="floor"></div>
+      <div class="hud"><div><span id="hn">LUCARIO</span><div class="bar"><i id="hhp" style="width:100%"></i></div></div><div class="r"><span id="fn">CHACAL</span><div class="bar"><i id="fhp" style="width:100%"></i></div></div></div>
+      <div class="actor" id="hero-a"><img class="px" id="hero-i" src="img/s_lucario_quieto.png" alt=""></div>
+      <div class="actor" id="foe-a"><img class="px" id="foe-i" src="img/s_chacal_quieto.png" alt=""></div>
+      <div class="pop" id="pop1" style="right:24%;top:90px"></div><div class="pop" id="pop2" style="left:20%;top:90px"></div>
+    </div>
+  </div></section>
+
+  <section id="capturas" class="rv"><div class="panel">
+    <h2><span lang="es">CAPTURAS DEL JUEGO</span><span lang="en">IN-GAME SCREENSHOTS</span></h2>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-k="mazmorra"><span lang="es">Mazmorra</span><span lang="en">Dungeon</span></button>
+      <button class="tab" role="tab" aria-selected="false" data-k="viaje"><span lang="es">Viaje</span><span lang="en">Journey</span></button>
+      <button class="tab" role="tab" aria-selected="false" data-k="pelea"><span lang="es">Pelea</span><span lang="en">Combat</span></button>
+      <button class="tab" role="tab" aria-selected="false" data-k="ciudad"><span lang="es">Ciudadela</span><span lang="en">Citadel</span></button>
+    </div>
+    <div class="pane on" id="pn-mazmorra" role="tabpanel"><button type="button" data-full="img/cap/mazmorra_1.png"><img src="img/cap/mazmorra_1.png" alt="Mazmorra" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/mazmorra_2.png"><img src="img/cap/mazmorra_2.png" alt="Mazmorra" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/mazmorra_3.png"><img src="img/cap/mazmorra_3.png" alt="Mazmorra" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/mazmorra_4.png"><img src="img/cap/mazmorra_4.png" alt="Mazmorra" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/mazmorra_5.png"><img src="img/cap/mazmorra_5.png" alt="Mazmorra" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/mazmorra_6.png"><img src="img/cap/mazmorra_6.png" alt="Mazmorra" loading="lazy" width="1280" height="720"></button></div><div class="pane" id="pn-viaje" role="tabpanel"><button type="button" data-full="img/cap/viaje_1.png"><img src="img/cap/viaje_1.png" alt="Viaje" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/viaje_2.png"><img src="img/cap/viaje_2.png" alt="Viaje" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/viaje_3.png"><img src="img/cap/viaje_3.png" alt="Viaje" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/viaje_4.png"><img src="img/cap/viaje_4.png" alt="Viaje" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/viaje_5.png"><img src="img/cap/viaje_5.png" alt="Viaje" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/viaje_6.png"><img src="img/cap/viaje_6.png" alt="Viaje" loading="lazy" width="1280" height="720"></button></div><div class="pane" id="pn-pelea" role="tabpanel"><button type="button" data-full="img/cap/pelea_1.png"><img src="img/cap/pelea_1.png" alt="Pelea" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/pelea_2.png"><img src="img/cap/pelea_2.png" alt="Pelea" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/pelea_3.png"><img src="img/cap/pelea_3.png" alt="Pelea" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/pelea_4.png"><img src="img/cap/pelea_4.png" alt="Pelea" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/pelea_5.png"><img src="img/cap/pelea_5.png" alt="Pelea" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/pelea_6.png"><img src="img/cap/pelea_6.png" alt="Pelea" loading="lazy" width="1280" height="720"></button></div><div class="pane" id="pn-ciudad" role="tabpanel"><button type="button" data-full="img/cap/ciudad_1.png"><img src="img/cap/ciudad_1.png" alt="Ciudadela" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/ciudad_2.png"><img src="img/cap/ciudad_2.png" alt="Ciudadela" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/ciudad_3.png"><img src="img/cap/ciudad_3.png" alt="Ciudadela" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/ciudad_4.png"><img src="img/cap/ciudad_4.png" alt="Ciudadela" loading="lazy" width="1280" height="720"></button><button type="button" data-full="img/cap/ciudad_5.png"><img src="img/cap/ciudad_5.png" alt="Ciudadela" loading="lazy" width="1280" height="720"></button></div>
+    <p class="note"><span lang="es">Capturas de la demo (versión alfa): todo puede cambiar. Tocá una para verla grande.</span><span lang="en">Screenshots from the demo (alpha build): everything may change. Tap one to enlarge.</span></p>
+  </div></section>
+
+  <section id="imagenes" class="rv"><div class="panel">
+    <h2><span lang="es">IMÁGENES</span><span lang="en">GALLERY</span></h2>
+    <div class="cards2">
+      <div class="post w"><img src="img/p_ciudadela.jpg" alt="" loading="lazy"></div>
+      <div class="post"><img src="img/p_emboscada.jpg" alt="" loading="lazy"></div>
+      <div class="post"><img src="img/p_golem.jpg" alt="" loading="lazy"></div>
+      <div class="post"><img src="img/p_escalada.jpg" alt="" loading="lazy"></div>
+      <div class="post"><img src="img/p_puente.jpg" alt="" loading="lazy"></div>
+      <div class="post w"><img src="img/p_campamento.jpg" alt="" loading="lazy"></div>
+    </div>
+    <p class="note"><span lang="es">Ilustraciones promocionales: el arte final puede cambiar.</span><span lang="en">Promotional art: final art may change.</span></p>
+  </div></section>
+
+  <section id="demo" class="rv"><div class="panel">
+    <h2>DEMO</h2>
+    <p lang="es">La demo cubre el primer tramo: llegada a la Ciudadela, primer viaje y primera mazmorra. Es una versión alfa, con errores y arte provisorio.</p>
+    <p lang="en">The demo covers the first stretch: arriving at the Citadel, the first journey and the first dungeon. It is an alpha build with bugs and placeholder art.</p>
+    <p>
+      <a class="btn" href="https://drive.google.com/file/d/1gey7SfmqZSTlz2BQ3-Bshsvf0aTfg5AC/view?usp=drive_link" target="_blank" rel="noopener">Windows</a><a class="btn" href="https://drive.google.com/file/d/1Qt2D6tnChQdNvE1F5q67bvRf_ijEHsEh/view?usp=drive_link" target="_blank" rel="noopener">Android</a><a class="btn" href="https://drive.google.com/file/d/1aI9x6wW0u1opnhE5epxesai-ww7S7Uz8/view?usp=drive_link" target="_blank" rel="noopener">Linux</a>
+    </p>
+    <p class="note"><span lang="es">La descarga se abre en Google Drive.</span><span lang="en">The download opens on Google Drive.</span></p>
+  </div></section>
+
+  <section id="roadmap" class="rv"><div class="panel">
+    <h2>ROADMAP</h2>
+    <table>
+      <tr><th><span lang="es">Hito</span><span lang="en">Milestone</span></th><th><span lang="es">Qué es</span><span lang="en">What it is</span></th><th class="est"><span lang="es">Estado</span><span lang="en">Status</span></th></tr>
+      <tr><td>Demo</td><td><span lang="es">Primer tramo: ciudad, primer viaje y primera mazmorra</span><span lang="en">First stretch: city, first journey and first dungeon</span></td><td class="est"><span lang="es">Completada, en pulido</span><span lang="en">Done, being polished</span></td></tr>
+      <tr><td><span lang="es">Acto 1</span><span lang="en">Act 1</span></td><td><span lang="es">El desierto: exploración, viajes y seis mazmorras principales</span><span lang="en">The desert: exploration, journeys and six main dungeons</span></td><td class="est"><span lang="es">En preparación</span><span lang="en">In preparation</span></td></tr>
+      <tr><td><span lang="es">Acto 2</span><span lang="en">Act 2</span></td><td><span lang="es">Un nuevo escenario con mapa propio</span><span lang="en">A new setting with its own map</span></td><td class="est"><span lang="es">Planeado</span><span lang="en">Planned</span></td></tr>
+      <tr><td><span lang="es">Acto 3</span><span lang="en">Act 3</span></td><td><span lang="es">El tramo final de la historia</span><span lang="en">The final stretch of the story</span></td><td class="est"><span lang="es">Planeado</span><span lang="en">Planned</span></td></tr>
+      <tr><td>Beta</td><td><span lang="es">Todo el contenido, dedicado a pulido y balance</span><span lang="en">All content, focused on polish and balance</span></td><td class="est"><span lang="es">Planeado</span><span lang="en">Planned</span></td></tr>
+      <tr><td><span lang="es">Lanzamiento</span><span lang="en">Launch</span></td><td><span lang="es">Los tres actos juntos</span><span lang="en">All three acts together</span></td><td class="est"><span lang="es">Planeado</span><span lang="en">Planned</span></td></tr>
+    </table>
+    <p class="note"><span lang="es">Sin fechas comprometidas: el plan cambia según lo que enseñen las pruebas.</span><span lang="en">No committed dates: the plan changes with what testing teaches us.</span></p>
+  </div></section>
+
+  <section id="apoyo" class="rv"><div class="panel">
+    <h2><span lang="es">COLABORAR</span><span lang="en">SUPPORT</span></h2>
+    <p lang="es">Quienes apoyen el proyecto podrán probar cada acto a medida que se termine, y sus comentarios van a influir en el juego. Patreon, próximamente.</p>
+    <p lang="en">Supporters will be able to play each act as it is finished, and their feedback will shape the game. Patreon coming soon.</p>
+  </div></section>
+
+  <section id="sobre-mi" class="rv"><div class="panel">
+    <h2><span lang="es">SOBRE MÍ</span><span lang="en">ABOUT ME</span></h2>
+    <div class="about">
+      <img class="me" src="img/marcos.png" alt="Marcos, también conocido como Maruko22" width="96" height="86">
+      <div>
+        <p lang="es">¡Hola! Soy Marcos, también conocido como <b>Maruko22</b>. Ojo Felino es un proyecto que siempre quise hacer de chico, y recién hoy creo que tengo las herramientas para hacerlo.</p>
+        <p lang="es">Yo me encargo del diseño del juego, la historia, los personajes y el mundo. Para el código trabajo con Claude, y para lo visual con GPT.</p>
+        <p lang="en">Hi! I'm Marcos, also known as <b>Maruko22</b>. Ojo Felino is a project I always wanted to make as a kid, and only now do I feel I have the tools to do it.</p>
+        <p lang="en">I handle the game design, the story, the characters and the world. I work with Claude for the code and with GPT for the visuals.</p>
+        <div class="chips"><a class="chip" href="https://www.youtube.com/@Maruko22" target="_blank" rel="noopener">YouTube</a><a class="chip" href="https://www.twitch.tv/maruko22" target="_blank" rel="noopener">Twitch</a><a class="chip" href="https://instagram.com/soymaruko22/" target="_blank" rel="noopener">Instagram</a><a class="chip" href="https://www.tiktok.com/@soymaruko22" target="_blank" rel="noopener">TikTok</a></div>
+        <p lang="es">Me encontrás en todas. Si querés formar parte del proyecto de forma activa, ¡contactame!</p>
+        <p lang="en">Find me on all of them. If you want to take an active part in the project, get in touch!</p>
+      </div>
+    </div>
+  </div></section>
+  </div>
+</main>
+
+<div id="lb"><img alt=""></div>
+<footer><div class="wrap">
+  <span lang="es">Ojo Felino es una marca registrada en Argentina (INPI). Versión alfa en desarrollo.</span>
+  <span lang="en">Ojo Felino is a trademark registered in Argentina (INPI). Alpha build in development.</span>
+</div></footer>
+
+<script>
+(function(){
+  var h=document.documentElement,es=document.getElementById('bes'),en=document.getElementById('ben');
+  function set(l){h.lang=l;es.setAttribute('aria-pressed',l==='es');en.setAttribute('aria-pressed',l==='en');try{localStorage.setItem('lang',l)}catch(e){}}
+  var l='es';try{l=localStorage.getItem('lang')||((navigator.language||'es').slice(0,2)==='en'?'en':'es')}catch(e){}
+  set(l);es.onclick=function(){set('es')};en.onclick=function(){set('en')};
+
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* fondo que cambia, con dos paletas (azul y naranja) */
+  var names=['desierto','pueblo','templo','torre','cueva','catacumbas'];
+  var seq=[['','desierto'],['','pueblo'],['','templo'],['w','torre'],['w','cueva'],['w','catacumbas'],['','torre'],['','cueva'],['','catacumbas'],['w','desierto'],['w','pueblo'],['w','templo']];
+  var box=document.getElementById('bgfx'),ls=[];
+  seq.forEach(function(q,i){var d=document.createElement('div');d.className='l'+(i===0?' on':'');d.style.backgroundImage='url(img/bg'+q[0]+'_'+q[1]+'.jpg)';d.style.animationDelay=(-i*4)+'s';box.appendChild(d);ls.push(d)});
+  var cur=0;function theme(i){document.documentElement.setAttribute('data-theme',seq[i][0]==='w'?'warm':'blue');cols();var a=document.getElementById('hero-i'),b=document.getElementById('foe-i');if(a&&a.dataset.n&&window.__setS){__setS(a,a.dataset.n);__setS(b,b.dataset.n)}}
+  var PC=['#f0c060','#e89696'];function cols(){PC=document.documentElement.getAttribute('data-theme')==='warm'?['#ffd27a','#f4a860']:['#f0c060','#e89696']}
+  theme(0);
+  if(!reduce)setInterval(function(){ls[cur].classList.remove('on');cur=(cur+1)%ls.length;ls[cur].classList.add('on');theme(cur)},7000);
+
+  /* aparecer al bajar */
+  var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.08}):null;
+  [].forEach.call(document.querySelectorAll('.rv'),function(e){io?io.observe(e):e.classList.add('in')});
+
+  /* brasas */
+  var cv=document.getElementById('sparks'),cx=cv.getContext('2d'),P=[];
+  function rs(){cv.width=innerWidth;cv.height=innerHeight}rs();addEventListener('resize',rs);
+  function mk(r){return{x:Math.random()*cv.width,y:r?Math.random()*cv.height:cv.height+10,s:2+Math.floor(Math.random()*3),v:.25+Math.random()*.7,dx:(Math.random()-.5)*.4,c:Math.random()<.7?0:1,a:.3+Math.random()*.6}}
+  for(var i=0;i<46;i++)P.push(mk(true));
+  function tick(){cx.clearRect(0,0,cv.width,cv.height);P.forEach(function(p,i){p.y-=p.v;p.x+=p.dx+Math.sin(p.y/40)*.2;if(p.y<-10)P[i]=mk(false);cx.globalAlpha=p.a;cx.fillStyle=PC[p.c];cx.fillRect(Math.round(p.x),Math.round(p.y),p.s,p.s)});requestAnimationFrame(tick)}
+  if(!reduce)tick();
+
+
+  /* capturas: pestañas y ampliar */
+  var tabs=document.querySelectorAll('.tab');
+  [].forEach.call(tabs,function(t){t.onclick=function(){[].forEach.call(tabs,function(x){x.setAttribute('aria-selected',x===t)});[].forEach.call(document.querySelectorAll('.pane'),function(p){p.classList.toggle('on',p.id==='pn-'+t.dataset.k)})}});
+  var lb=document.getElementById('lb'),lbi=lb.firstElementChild;
+  [].forEach.call(document.querySelectorAll('.pane button'),function(b){b.onclick=function(){lbi.src=b.dataset.full;lb.classList.add('on')}});
+  lb.onclick=function(){lb.classList.remove('on')};addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('on')});
+
+  /* duelo */
+  var Z=innerWidth<560?1.4:2,hi=document.getElementById('hero-i'),fi=document.getElementById('foe-i'),ha=document.getElementById('hero-a'),fa=document.getElementById('foe-a'),
+      hhp=document.getElementById('hhp'),fhp=document.getElementById('fhp'),fn=document.getElementById('fn'),stbg=document.getElementById('stbg'),
+      p1=document.getElementById('pop1'),p2=document.getElementById('pop2');
+  var foes=[['CHACAL','chacal','desierto'],['GOLEM','golem','templo'],['ESQUELETO','esqueleto','catacumbas'],['ESPECTRO','espectro','cueva']];
+  var cache={};function pre(n){['s_','sw_'].forEach(function(p){if(!cache[p+n]){var i=new Image();i.src='img/'+p+n+'.png';cache[p+n]=i}})}
+  ['lucario_quieto','lucario_ataque','lucario_golpe','lucario_defensa'].forEach(pre);
+  foes.forEach(function(f){['quieto','ataque','golpe'].forEach(function(s){pre(f[1]+'_'+s)})});
+  function setS(img,n){var wp=document.documentElement.getAttribute('data-theme')==='warm'?'sw_':'s_';img.dataset.n=n;img.src='img/'+wp+n+'.png';img.onload=function(){img.style.width=img.naturalWidth*Z+'px'}; if(img.complete&&img.naturalWidth)img.style.width=img.naturalWidth*Z+'px'}
+  window.__setS=setS;
+  function sl(ms){return new Promise(function(r){setTimeout(r,ms)})}
+  function pop(el,t){el.textContent=t;el.classList.remove('go');void el.offsetWidth;el.classList.add('go')}
+  function hit(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');el.firstElementChild.classList.add('flash');setTimeout(function(){el.firstElementChild.classList.remove('flash')},180)}
+  var vis=true;if('IntersectionObserver' in window)new IntersectionObserver(function(e){vis=e[0].isIntersecting}).observe(document.getElementById('stage'));
+  async function loop(){
+    var k=0,hp=100;
+    while(true){
+      var f=foes[k%foes.length];k++;var fhpv=100;
+      fn.textContent=f[0];stbg.style.backgroundImage='url(img/bg'+(document.documentElement.getAttribute('data-theme')==='warm'?'w':'')+'_'+f[2]+'.jpg)';fhp.style.width='100%';hhp.style.width='100%';
+      setS(hi,'lucario_quieto');setS(fi,f[1]+'_quieto');
+      fa.style.transition='none';fa.style.transform='translateX(260px)';fa.style.opacity=0;void fa.offsetWidth;fa.style.transition='transform .8s steps(8),opacity .5s';fa.style.transform='none';fa.style.opacity=1;
+      await sl(1100);
+      for(var r=0;r<3;r++){
+        while(!vis)await sl(500);
+        /* Lucario ataca */
+        setS(hi,'lucario_ataque');ha.style.transform='translateX(70px)';await sl(380);
+        setS(fi,f[1]+'_golpe');hit(fa);var dmg=r===2?'CRÍTICO!':'-'+(8+Math.floor(Math.random()*10));pop(p1,dmg);fhpv=Math.max(r===2?0:fhpv-30,0);fhp.style.width=fhpv+'%';await sl(520);
+        ha.style.transform='none';setS(hi,'lucario_quieto');if(r<2)setS(fi,f[1]+'_quieto');await sl(450);
+        if(r===2)break;
+        /* el enemigo ataca */
+        setS(fi,f[1]+'_ataque');fa.style.transform='translateX(-60px)';await sl(380);
+        setS(hi,'lucario_defensa');pop(p2,'BLOQUEO');hit(ha);hp=Math.max(hp-10,40);hhp.style.width=hp+'%';await sl(520);
+        fa.style.transform='none';setS(fi,f[1]+'_quieto');setS(hi,'lucario_quieto');await sl(500);
+      }
+      fa.style.opacity=0;await sl(900);
+      hp=100;
+    }
+  }
+  if(!reduce)loop();else{setS(hi,'lucario_quieto');setS(fi,'chacal_quieto');stbg.style.backgroundImage='url(img/bg_desierto.jpg)'}
+})();
+</script>
+</body>
+</html>
